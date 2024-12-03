@@ -1,0 +1,8 @@
+cache
+datasets
+exports
+Results
+pandasai.log
+pinguin_csv_app.py
+.idea
+__pycache__

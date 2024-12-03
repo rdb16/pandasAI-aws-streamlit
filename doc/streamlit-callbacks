@@ -1,0 +1,25 @@
+Streamlit, ainsi que la solution finale retenue.
+1. Problème de Réinitialisation du Champ st.text_area()
+
+    Contexte : L'application devait permettre de soumettre une question via un champ de texte (st.text_area()) et de réinitialiser ce champ lorsque l'utilisateur cliquait sur le bouton "Nouvelle question". Initialement, la fonction clear_input() essayait de remettre la valeur à une chaîne vide ("") en modifiant directement st.session_state.
+
+    Erreur Rencontrée :
+        StreamlitAPIException : Une erreur indiquait que st.session_state.input_text ne pouvait pas être modifié après l'instantiation du widget avec la même clé (key="input_text"). Cela est dû au fait que Streamlit empêche la modification de la valeur de l'état d'un widget après que celui-ci a été rendu.
+
+    Cause du Problème :
+        Streamlit gère l'état des widgets (st.text_area(), st.button(), etc.) avec st.session_state et ne permet pas de mettre à jour directement l'état d'un widget après son initialisation.
+        Le champ st.text_area() était initialisé avec une clé (key="input_text"), et toute tentative de modification de sa valeur via st.session_state après l'initialisation entraînait une collision.
+
+2. Solution Finale Retenue
+
+Pour contourner le problème, la solution a consisté à utiliser des callbacks pour réinitialiser la valeur du champ texte de manière appropriée avant que Streamlit ne rende à nouveau l'interface. Voici les éléments-clés de la solution retenue :
+
+    Utilisation de Callbacks avec le Bouton "Nouvelle question" :
+        Le bouton "Nouvelle question" a été configuré avec un paramètre on_click pour appeler la fonction clear_input().
+        Ce callback est exécuté lorsque le bouton est cliqué, ce qui permet de modifier st.session_state avant que le script Streamlit ne soit réexécuté.
+        Cela garantit que st.session_state.input_text est bien mis à jour avant que st.text_area() soit rendu à nouveau.
+
+    Modifications dans le Code :
+        clear_input() remet st.session_state.input_text à une chaîne vide ("").
+        La valeur de st.text_area() est définie par value=st.session_state.input_text pour s'assurer que la valeur vide est bien prise en compte après le clic sur "Nouvelle question".
+        Le bouton "Nouvelle question" appelle clear_input() via on_click, ce qui permet de réinitialiser correctement st.session_state.
